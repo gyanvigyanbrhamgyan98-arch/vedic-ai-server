@@ -9,9 +9,15 @@ app.use(express.json());
 // OpenAI API Key from Environment Variable
 const API_KEY = process.env.OPENAI_API_KEY;
 
-// POST endpoint for asking question
+// --------- Root GET Route ---------
+app.get("/", (req, res) => {
+  res.send("AI Vedic Guru server running. Use POST /ask for questions.");
+});
+
+// --------- POST /ask Route ---------
 app.post("/ask", async (req, res) => {
   const question = req.body.question;
+  if(!question) return res.status(400).json({ answer: "Question is required." });
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -23,7 +29,7 @@ app.post("/ask", async (req, res) => {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "You are a Vedic AI Guru. Give short, simple answers." },
+          { role: "system", content: "You are a Vedic AI Guru. Give short, simple answers in English." },
           { role: "user", content: question }
         ]
       })
@@ -37,6 +43,6 @@ app.post("/ask", async (req, res) => {
   }
 });
 
-// Start server
+// --------- Start Server ---------
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
